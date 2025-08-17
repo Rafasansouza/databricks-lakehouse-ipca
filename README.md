@@ -2,6 +2,7 @@
 
 ## Entendendo o Projeto
 
+
 ### Contexto e requisitos:
 
 *"Nosso cliente é o Banco IP2CA, um grande banco do mercado brasileiro de varejo com atuação há 30 anos e uma base de 50 milhões de clientes ativos.*
@@ -12,6 +13,8 @@
 
 Análise e requisitos:
 ![Análise e requisitos da Case](04-pics/01-analise-case.png)
+
+
 
 ### Objetivo:
 
@@ -26,17 +29,20 @@ O objetivo é criar um pipeline de dados robusto e escalável, desde a ingestão
 *   **Python:** Linguagem de programação utilizada para o desenvolvimento dos notebooks de processamento de dados.
 *   **Power BI:** Ferramenta de Business Intelligence para visualização e análise dos dados finais.
 
+
 ### Arquitetura e Fluxo de Dados:
 
 Uma representação visual da arquitetura pode ser encontrada no arquivo `01-architecture/Architecture-case-ip2ca.excalidraw`, como na imagem abaixo:
 
 ![Arquitetura do projeto](04-pics/02-arquitetura-definindo-stack.png)
 
-O fluxo de dados é organizado em três camadas principais, seguindo a metodologia de medalhões (Bronze, Silver, Gold):
+O fluxo de dados é organizado em três camadas principais, seguindo a metodologia medalhão (Bronze, Silver, Gold):
 
 1.  **Camada Bronze (Raw Data):** Ingestão de dados brutos diretamente da API do BCB. Os dados são armazenados no formato Delta Lake, mantendo a integridade e o histórico.
 2.  **Camada Silver (Cleaned & Conformed Data):** Limpeza, padronização e enriquecimento dos dados da camada Bronze. Nesta etapa, são aplicadas transformações para garantir a qualidade e a consistência dos dados.
 3.  **Camada Gold (Curated & Aggregated Data):** Agregação e sumarização dos dados da camada Silver para atender a requisitos específicos de negócios e análise. Esta camada é otimizada para consumo por ferramentas de BI.
+
+
 
 ## Pré-requisitos
 
@@ -45,6 +51,8 @@ Para replicar este projeto, você precisará dos seguintes itens:
 *   **Databricks Community:** Uma conta no Databricks Community para executar os notebooks e gerenciar o Delta Lake.
 *   **Python:** Conhecimento intermediario em Python para entender e modificar os scripts.
 *   **Power BI Desktop:** Para abrir e interagir com o dashboard de exemplo.
+
+
 
 ## Estrutura do Projeto
 
@@ -77,9 +85,12 @@ databricks-lakehouse-ipca/
 └── README.md                         # Este arquivo
 ```
 
+
+
 ## Configuração e Execução
 
 Siga os passos abaixo para configurar e executar o projeto no seu ambiente Databricks:
+
 
 ### 1. Importar Notebooks para o Databricks
 
@@ -90,6 +101,7 @@ Siga os passos abaixo para configurar e executar o projeto no seu ambiente Datab
 1.3.  Escolha a opção 'File' e faça o upload dos arquivos `.py` localizados na pasta `02-notebooks` do projeto (`01-bronze-layer.py`, `02-silver-layer.py`, `03-gold-layer.py`, `04-Query-IPCA-gold-layer.py`). 
 
 Certifique-se de que o formato de importação seja 'Python Notebook'.
+
 
 ### 2. Executar os Notebooks
 
@@ -124,6 +136,7 @@ Os notebooks devem ser executados na seguinte ordem para garantir a correta prog
     
 *   Certifique-se de que os caminhos de armazenamento (`/FileStore/tables/case_ip2ca/bronze`, `/FileStore/tables/case_ip2ca/silver`, `/FileStore/tables/case_ip2ca/gold`) estejam acessíveis e configurados corretamente no seu ambiente Databricks. Eles são definidos dentro de cada notebook.
 
+
 ### 3. Conectar o Power BI ao Delta Lake (Camada Gold)
 
 Como este projeto foi desenvolvido com o Databricks Community Edition temos uma limitação com a conexão direta do power bi no databricks. Sendo assim, tomei como uma medida alternativa extrair o dataset da tabela gold e importar os dados pelo arquivo local em anexo `03-analytics/dataset/04_query_ipca_accumulated_annual.csv`. Para extrair o seu dataset execute o notebook `02-notebooks\04-Query-IPCA-gold-layer.py` e faça download da tabela conforme o print abaixo.
@@ -131,7 +144,6 @@ Como este projeto foi desenvolvido com o Databricks Community Edition temos uma 
 ![Como extrair o dataset do Databricks Community](04-pics/07-baixar-dataset.png)
 
 **Observação:** O arquivo `.pbix` já está do dataset importando. Porem, se quiser refazer as etapas e extrair seu dataset você vai precisar atualizar o caminho da fonte de dados.
-
 
 
 
@@ -150,6 +162,22 @@ As imagens na pasta `04-pics` fornecem exemplos de visualizações e etapas do p
 *   `07-baixar-dataset.png`: Demonstração de como baixar o dataset de exemplo.
 
 Essas visualizações demonstram a eficácia da arquitetura Data Lakehouse em fornecer dados limpos e agregados para análise de negócios.
+
+
+
+## Considerações para ambiente de Produção
+
+No caso deste projeto, ele foi realizado como teste/desafio. Devido a isso, alguns processos não foram tão relevantes. Porém, considerando um ambiente de produção, o cenário muda e alguns processos/etapas são fundamentais. Por exemplo:
+
+*   **Refatorar os códigos python das camadas:** Neste cenário eu consideraria `Modularização`, `Abstração` e `Orientação a objetos`. Pois, são essências para o ambiente de produção e principalmente para escalabilidade. Dividindo o código em funções/classes e deixando o código mais legivel e reutilizável.
+
+*   **Maior nível de organização dos diretórios:** Neste caso de estudo, crie um diretório no databricks do projeto e dentro as camadas `bronze`, `silver` e `gold`. Porém, esse cenário muda, em produção, no qual geralmente temos as camadas e dentro delas, diferentes projetos. O que seria mais interessante para maior escalabilidade. No caso deste projeto, inclui um particionamento por ano e mês só para demonstrar conhecimento em grandes volumes de dados, visto que particionar vai dar vantagens como performace, organização e menor custo.
+
+*   **Orquestração do código:** Devido as limitações do community não pude orquestra no databricks com o Workflows. Mas, considero essêncial para o ambiente de produção. Criar uma rotina e manter o pipeline funcionando para garantir a atualização dos dados de forma automática. Já fiz projetos orquestrando com Data Factory no databricks e tenho projetos atualmente em produção com o Apache Airflow.
+
+*   **Ferramenta de análise de dados direto na fonte:** Essa etapa não consegui realizar no databricks community. Mas é extremamente importante resaltar que conectar os dados na fonte é essencial para manter credibilidade nas informações apresentadas.
+
+Bom, acredito que esse seja os pontos principais.
 
 
 ## Contribuições
