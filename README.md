@@ -77,35 +77,45 @@ Siga os passos abaixo para configurar e executar o projeto no seu ambiente Datab
 ### 1. Importar Notebooks para o Databricks
 
 1.1.  No seu Databricks Workspace, navegue até a área de 'Workspace'.
+
 1.2.  Clique com o botão direito em uma pasta desejada (ou crie uma nova) e selecione 'Import'.
-1.3.  Escolha a opção 'File' e faça o upload dos arquivos `.py` localizados na pasta `02-notebooks` do projeto (`01-bronze-layer.py`, `02-silver-layer.py`, `03-gold-layer.py`, `04-Query-IPCA-gold-layer.py`). Certifique-se de que o formato de importação seja 'Python Notebook'.
+
+1.3.  Escolha a opção 'File' e faça o upload dos arquivos `.py` localizados na pasta `02-notebooks` do projeto (`01-bronze-layer.py`, `02-silver-layer.py`, `03-gold-layer.py`, `04-Query-IPCA-gold-layer.py`). 
+
+Certifique-se de que o formato de importação seja 'Python Notebook'.
 
 ### 2. Executar os Notebooks
 
 Os notebooks devem ser executados na seguinte ordem para garantir a correta progressão dos dados pelas camadas Bronze, Silver e Gold:
 
 2.1.  **`01-bronze-layer.py`:**
+
     *   Este notebook é responsável por consumir a API do Banco Central do Brasil e carregar os dados brutos do IPCA para a camada Bronze do Delta Lake.
     *   Ele busca dados dos últimos 30 anos até a data atual.
     *   Os dados são particionados por ano e mês para otimização de consultas.
     *   **Local de armazenamento:** `/FileStore/tables/case_ip2ca/bronze`
 
 2.2.  **`02-silver-layer.py`:**
+
     *   Este notebook lê os dados da camada Bronze, aplica etapas de limpeza e padronização (como remoção de valores nulos e duplicatas) e salva os dados processados na camada Silver.
     *   **Local de armazenamento:** `/FileStore/tables/case_ip2ca/silver`
 
 2.3.  **`03-gold-layer.py`:**
+
     *   Este notebook processa os dados da camada Silver, realizando agregações para calcular o IPCA acumulado anualmente.
     *   Os dados resultantes são armazenados na camada Gold, otimizados para consumo por ferramentas de BI.
     *   **Local de armazenamento:** `/FileStore/tables/case_ip2ca/gold`
 
 2.4.  **`04-Query-IPCA-gold-layer.py`:**
+
     *   Este notebook demonstra como consultar os dados da camada Gold. Ele pode ser usado para verificar os dados antes de conectá-los ao Power BI ou para exportar um CSV de exemplo.
 
 **Observações:** 
-    - Bom, neste caso de ambiente de estudo não me preocupei com orquestrar os notebooks, até por que esta opção não é disponivel no Databricks Community Edition. Mas, vale lembrar que esta etpa é de extrema importancia para um ambiente de produção. Segue imagem abaixo:
+
+    *   Bom, neste caso de ambiente de estudo não me preocupei com orquestrar os notebooks, até por que esta opção não é disponivel no Databricks Community Edition. Mas, vale lembrar que esta etpa é de extrema importancia para um ambiente de produção. Segue imagem abaixo:
     ![Indisponibilidade do Workflows no Databbricks Community](04-pics/08-workflows-indisponiveis.png)
-    - Certifique-se de que os caminhos de armazenamento (`/FileStore/tables/case_ip2ca/bronze`, `/FileStore/tables/case_ip2ca/silver`, `/FileStore/tables/case_ip2ca/gold`) estejam acessíveis e configurados corretamente no seu ambiente Databricks. Eles são definidos dentro de cada notebook.
+    
+    *   Certifique-se de que os caminhos de armazenamento (`/FileStore/tables/case_ip2ca/bronze`, `/FileStore/tables/case_ip2ca/silver`, `/FileStore/tables/case_ip2ca/gold`) estejam acessíveis e configurados corretamente no seu ambiente Databricks. Eles são definidos dentro de cada notebook.
 
 ### 3. Conectar o Power BI ao Delta Lake (Camada Gold)
 
@@ -135,6 +145,6 @@ As imagens na pasta `04-pics` fornecem exemplos de visualizações e etapas do p
 Essas visualizações demonstram a eficácia da arquitetura Data Lakehouse em fornecer dados limpos e agregados para análise de negócios.
 
 
-## Como Contribuir
+## Contribuições
 
 Contribuições são bem-vindas! Em caso de dúvidas ou networking pode entra em contato comigo pelos canais disponíveis na minha Bio. Obrigado!
